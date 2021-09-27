@@ -38,6 +38,7 @@ async def f_command(bot: Client, m: Message):
                 caption="(c) @AbirHasan2005"
             )
             await editable.edit("Sent `app.json` !!")
+            os.remove(app_json)
         else:
             await editable.edit("Failed to Make `app.json` !!\n\n"
                                 "Try again.")
