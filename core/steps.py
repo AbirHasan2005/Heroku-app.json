@@ -201,9 +201,9 @@ async def StartSteps(bot: Client, editable: Message):
                         reply_markup=ikeyboard,
                         disable_web_page_preview=True)
     input_m: Message = await bot.listen(editable.chat.id, timeout=600)
-    if input_m.text.startswith("/skip"):
+    if input_m.text and input_m.text.startswith("/skip"):
         del heroku_app["logo"]
-    elif input_m.text.startswith("/"):
+    elif input_m.text and input_m.text.startswith("/"):
         return await input_m.continue_propagation()
     elif input_m.photo:
         await editable.edit("Processing Logo ...")
