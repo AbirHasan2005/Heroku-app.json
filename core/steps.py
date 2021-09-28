@@ -9,6 +9,7 @@ from pyrogram.types import (
     InlineKeyboardMarkup,
     InlineKeyboardButton
 )
+from telegraph import upload_file
 from core.fix import FixEnvData
 
 inflect = __inflect.engine()
@@ -20,15 +21,18 @@ ikeyboard = InlineKeyboardMarkup([
 async def StartSteps(bot: Client, editable: Message):
     heroku_app = {
         "name": "",
+        "logo": "",
         "description": "",
         "keywords": list(),
         "repository": "",
         "website": "",
         "success_url": "",
         "env": dict(),
+        "stack": "",
         "buildpacks": list(),
         "formation": dict()
     }
+    ## --- Step 1 --- ##
     await editable.edit("**Step 1:**\n"
                         "Send me your Heroku App Name.",
                         reply_markup=ikeyboard)
@@ -37,6 +41,7 @@ async def StartSteps(bot: Client, editable: Message):
         return await input_m.continue_propagation()
     heroku_app["name"] = input_m.text
     await input_m.delete(True)
+    ## --- Step 2 --- ##
     await editable.edit("**Step 2:**\n"
                         "Now send me your Heroku App Description.\n\n"
                         "To Skip this Step Press /skip",
@@ -48,6 +53,7 @@ async def StartSteps(bot: Client, editable: Message):
     elif input_m.text.startswith("/"):
         return await input_m.continue_propagation()
     await input_m.delete(True)
+    ## --- Step 3 --- ##
     await editable.edit("**Step 3:**\n"
                         "Now send me your Heroku App Keywords.\n"
                         "Separate using comma(`,`)\n\n"
@@ -60,6 +66,7 @@ async def StartSteps(bot: Client, editable: Message):
     elif input_m.text.startswith("/"):
         return await input_m.continue_propagation()
     await input_m.delete(True)
+    ## --- Step 4 --- ##
     await editable.edit("**Step 4:**\n"
                         "Now send me your GitHub Repository Link.",
                         reply_markup=ikeyboard)
@@ -70,6 +77,7 @@ async def StartSteps(bot: Client, editable: Message):
     elif input_m.text.startswith("/"):
         return await input_m.continue_propagation()
     await input_m.delete(True)
+    ## --- Step 5 --- ##
     await editable.edit("**Step 5:**\n"
                         "Now send me your Website Link.\n\n"
                         "To Skip this Step Press /skip",
@@ -81,6 +89,7 @@ async def StartSteps(bot: Client, editable: Message):
     elif input_m.text.startswith("/"):
         return await input_m.continue_propagation()
     await input_m.delete(True)
+    ## --- Step 6 --- ##
     await editable.edit("**Step 6:**\n"
                         "Now send me your Success URL.\n\n"
                         "To Skip this Step Press /skip",
@@ -92,6 +101,7 @@ async def StartSteps(bot: Client, editable: Message):
     elif input_m.text.startswith("/"):
         return await input_m.continue_propagation()
     await input_m.delete(True)
+    ## --- Step 7 --- ##
     await editable.edit("**Step 7:**\n"
                         "Now time for ENV configs!\n\n"
                         "When done press /done\n\n"
@@ -110,6 +120,7 @@ async def StartSteps(bot: Client, editable: Message):
             continue
         elif input_m.text.startswith("/done"):
             env_inputs_running = False
+            await _cache_m.delete(True)
             continue
         elif input_m.text.startswith("/"):
             return await input_m.continue_propagation()
@@ -129,6 +140,7 @@ async def StartSteps(bot: Client, editable: Message):
             heroku_app["env"][f"{input_str[0].upper()}"]["generator"] = f"{input_str[4]}"
         await input_m.delete(True)
         await _cache_m.delete(True)
+    ## --- Step 8 --- ##
     await editable.edit("**Step 8:**\n"
                         "Now send Heroku App [Buildpacks](https://telegra.ph/Heroku-Default-Buildpacks-09-27) list.\n"
                         "Separate with (`|`)\n\n"
@@ -144,6 +156,7 @@ async def StartSteps(bot: Client, editable: Message):
     elif input_m.text.startswith("/"):
         return await input_m.continue_propagation()
     await input_m.delete(True)
+    ## --- Step 9 --- ##
     await editable.edit("**Step 9:**\n"
                         "What type of process?\n"
                         "Send [`web`] or [`worker`]\n\n"
@@ -159,6 +172,7 @@ async def StartSteps(bot: Client, editable: Message):
         process_type = "worker"
     heroku_app["formation"][f"{process_type}"] = {}
     await input_m.delete(True)
+    ## --- Step 10 --- ##
     await editable.edit("**Step 10:**\n"
                         "What will be Dyno Type?\n"
                         "Send [`free`] or [`hobby`] or [`standard-1x`] or "
@@ -179,6 +193,45 @@ async def StartSteps(bot: Client, editable: Message):
         "quantity": 1,
         "size": f"{dyno_type}"
     }
+    await input_m.delete(True)
+    ## --- Step 11 --- ##
+    await editable.edit("**Step 11:**\n"
+                        "Send me Logo in JPG format for your Heroku App.\n\n"
+                        "To Skip this Step Press /skip",
+                        reply_markup=ikeyboard,
+                        disable_web_page_preview=True)
+    input_m: Message = await bot.listen(editable.chat.id, timeout=600)
+    if input_m.text.startswith("/skip"):
+        del heroku_app["logo"]
+    elif input_m.text.startswith("/"):
+        return await input_m.continue_propagation()
+    elif input_m.photo:
+        await editable.edit("Processing Logo ...")
+        logo_jpg = await bot.download_media(input_m, file_name=f"./downloads/logo/{str(editable.chat.id)}/{str(editable.message_id)}/")
+        resp = upload_file(logo_jpg)
+        logo_jpg = f"https://telegra.ph/{resp[0]}"
+        heroku_app["logo"] = logo_jpg
+    else:
+        del heroku_app["logo"]
+    await input_m.delete(True)
+    ## --- Step 11 --- ##
+    await editable.edit("**Step 12:**\n"
+                        "Send me [Heroku Stack](https://devcenter.heroku.com/articles/stack) level.\n"
+                        "From here [`container`, `heroku-20`, `heroku-18`, `heroku-16`]",
+                        reply_markup=ikeyboard,
+                        disable_web_page_preview=True)
+    input_m: Message = await bot.listen(editable.chat.id, timeout=600)
+    if input_m.text.startswith("/skip"):
+        del heroku_app["stack"]
+    elif input_m.text.startswith("/"):
+        return await input_m.continue_propagation()
+    else:
+        heroku_stack_level = input_m.text.lower().strip()
+        if heroku_stack_level not in ["container", "heroku-20", "heroku-18", "heroku-16"]:
+            heroku_stack_level = "heroku-20"
+        heroku_app["stack"] = heroku_stack_level
+    await input_m.delete(True)
+    ## --- Make --- ##
     await editable.edit("Making `app.json` ...")
     app_json = f"./downloads/{str(editable.chat.id)}/{str(editable.message_id)}/"
     if not os.path.exists(app_json):

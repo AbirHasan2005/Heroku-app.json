@@ -35,7 +35,7 @@ async def f_command(bot: Client, m: Message):
             await bot.send_document(
                 chat_id=m.chat.id,
                 document=app_json,
-                caption="(c) @AbirHasan2005"
+                caption="**Made by @HerokuAppJson_Bot**"
             )
             await editable.edit("Sent `app.json` !!")
             os.remove(app_json)

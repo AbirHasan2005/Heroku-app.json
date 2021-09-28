@@ -1,0 +1,45 @@
+{
+    "name": "Heroku app.json Maker Bot",
+    "description": "A Telegram bot for making Heroku app.json File by @AbirHasan2005",
+    "keywords": [
+        "telegram",
+        "bot",
+        "heroku",
+        "app.json",
+        "app",
+        "json",
+        "maker",
+        "generator"
+    ],
+    "repository": "https://github.com/AbirHasan2005/Heroku-app.json",
+    "website": "https://github.com/AbirHasan2005/Heroku-app.json",
+    "success_url": "https://t.me/HerokuAppJson_Bot",
+    "env": {
+        "API_ID": {
+            "description": "Get from https://t.me/TeleORG_Bot"
+        },
+        "API_HASH": {
+            "description": "Get from https://t.me/TeleORG_Bot"
+        },
+        "BOT_TOKEN": {
+            "description": "Get from https://t.me/BotFather"
+        },
+        "SESSION_NAME": {
+            "description": "Any Session Name of Bot",
+            "required": "False",
+            "value": "Heroku-Bot"
+        }
+    },
+    "stack": "heroku-20",
+    "buildpacks": [
+        {
+            "url": "heroku/python"
+        }
+    ],
+    "formation": {
+        "worker": {
+            "quantity": 1,
+            "size": "free"
+        }
+    }
+}

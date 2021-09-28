@@ -2,3 +2,4 @@ pyrogram
 TgCrypto
 pyromod
 inflect
+telegraph
