@@ -126,6 +126,7 @@ async def StartSteps(bot: Client, editable: Message):
         if input_m.text.startswith("/skip"):
             del heroku_app["env"]
             env_inputs_running = False
+            await _cache_m.delete(True)
             continue
         elif input_m.text.startswith("/done"):
             env_inputs_running = False
@@ -266,10 +267,11 @@ async def StartSteps(bot: Client, editable: Message):
     await input_m.delete(True)
     ## --- Make --- ##
     await editable.edit("Making `app.json` ...")
-    app_json = f"./downloads/{str(editable.chat.id)}/{str(editable.message_id)}/"
-    if not os.path.exists(app_json):
-        os.makedirs(app_json)
+    app_json_f = os.path.join("downloads", str(editable.chat.id), str(editable.message_id))
+    if not os.path.exists(app_json_f):
+        os.makedirs(app_json_f)
+    app_json = os.path.join(app_json_f, "app.json")
     js = json.dumps(heroku_app, indent=4, separators=(",", ": "))
-    with open(f"{app_json}/app.json", "w+") as f:
+    with open(app_json, "w+") as f:
         f.write(js)
-    return f"{app_json}/app.json"
+    return app_json
