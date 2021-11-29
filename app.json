@@ -26,8 +26,6 @@
         },
         "SESSION_NAME": {
             "description": "Any Session Name of Bot",
-            "required": "False",
-            "value": "Heroku-Bot"
         }
     },
     "stack": "heroku-20",
